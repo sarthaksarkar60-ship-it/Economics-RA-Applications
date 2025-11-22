@@ -1,0 +1,173 @@
+<html>
+<head>
+<title>Bayesian3.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #2aacb8;}
+.s4 { color: #7a7e85;}
+.s5 { color: #5f826b; font-style: italic;}
+.s6 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Bayesian3.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">math</span>
+<span class="s0">import </span><span class="s1">scipy</span><span class="s2">.</span><span class="s1">stats </span><span class="s0">as </span><span class="s1">sps</span>
+<span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<span class="s0">import </span><span class="s1">matplotlib</span><span class="s2">.</span><span class="s1">pyplot </span><span class="s0">as </span><span class="s1">plt</span>
+<span class="s0">def </span><span class="s1">bern</span><span class="s2">(</span><span class="s1">p</span><span class="s2">):</span>
+    <span class="s0">if </span><span class="s1">np</span><span class="s2">.</span><span class="s1">random</span><span class="s2">.</span><span class="s1">rand</span><span class="s2">()&gt;</span><span class="s1">p</span><span class="s2">:</span>
+        <span class="s0">return </span><span class="s3">0</span>
+    <span class="s0">else</span><span class="s2">:</span>
+        <span class="s0">return </span><span class="s3">1</span>
+<span class="s0">def </span><span class="s1">random_joint_distribution</span><span class="s2">(</span><span class="s1">n</span><span class="s2">):</span>
+    <span class="s1">probs </span><span class="s2">= </span><span class="s1">np</span><span class="s2">.</span><span class="s1">random</span><span class="s2">.</span><span class="s1">rand</span><span class="s2">(</span><span class="s1">n</span><span class="s2">)  </span><span class="s4"># random numbers from uniform[0,1)</span>
+    <span class="s0">return </span><span class="s1">probs </span><span class="s2">/ </span><span class="s1">probs</span><span class="s2">.</span><span class="s1">sum</span><span class="s2">()</span>
+
+<span class="s0">def </span><span class="s1">bayesian_climate_game</span><span class="s2">(</span><span class="s1">a</span><span class="s2">,</span><span class="s1">n</span><span class="s2">,</span><span class="s1">l</span><span class="s2">):</span>
+    <span class="s1">b </span><span class="s2">= </span><span class="s3">0</span>
+    <span class="s1">param </span><span class="s2">= </span><span class="s1">np</span><span class="s2">.</span><span class="s1">random</span><span class="s2">.</span><span class="s1">rand</span><span class="s2">(</span><span class="s3">5</span><span class="s2">)</span><span class="s4"># beta, alpha, gamma, pl and ph</span>
+    <span class="s1">strategy_matrix </span><span class="s2">= </span><span class="s1">np</span><span class="s2">.</span><span class="s1">zeros</span><span class="s2">((</span><span class="s1">a</span><span class="s2">,</span><span class="s1">n</span><span class="s2">))</span>
+    <span class="s1">param</span><span class="s2">[</span><span class="s3">4</span><span class="s2">],</span><span class="s1">param</span><span class="s2">[</span><span class="s3">3</span><span class="s2">] = </span><span class="s1">max</span><span class="s2">(</span><span class="s1">param</span><span class="s2">[</span><span class="s3">3</span><span class="s2">]/(</span><span class="s1">param</span><span class="s2">[</span><span class="s3">3</span><span class="s2">]+</span><span class="s1">param</span><span class="s2">[</span><span class="s3">4</span><span class="s2">]),</span><span class="s1">param</span><span class="s2">[</span><span class="s3">4</span><span class="s2">]/(</span><span class="s1">param</span><span class="s2">[</span><span class="s3">3</span><span class="s2">]+</span><span class="s1">param</span><span class="s2">[</span><span class="s3">4</span><span class="s2">])),</span><span class="s1">min</span><span class="s2">(</span><span class="s1">param</span><span class="s2">[</span><span class="s3">3</span><span class="s2">]/(</span><span class="s1">param</span><span class="s2">[</span><span class="s3">3</span><span class="s2">]+</span><span class="s1">param</span><span class="s2">[</span><span class="s3">4</span><span class="s2">]),</span><span class="s1">param</span><span class="s2">[</span><span class="s3">4</span><span class="s2">]/(</span><span class="s1">param</span><span class="s2">[</span><span class="s3">3</span><span class="s2">]+</span><span class="s1">param</span><span class="s2">[</span><span class="s3">4</span><span class="s2">]))</span>
+    <span class="s1">param</span><span class="s2">[</span><span class="s3">2</span><span class="s2">] = </span><span class="s1">max</span><span class="s2">(</span><span class="s1">param</span><span class="s2">[</span><span class="s3">3</span><span class="s2">]/</span><span class="s1">param</span><span class="s2">[</span><span class="s3">4</span><span class="s2">],</span><span class="s1">param</span><span class="s2">[</span><span class="s3">2</span><span class="s2">])</span>
+    <span class="s0">while </span><span class="s1">b</span><span class="s2">&lt;</span><span class="s1">a</span><span class="s2">:</span>
+       <span class="s1">type_matrix </span><span class="s2">= </span><span class="s1">np</span><span class="s2">.</span><span class="s1">zeros</span><span class="s2">((</span><span class="s3">3</span><span class="s2">, </span><span class="s1">n</span><span class="s2">))</span>
+       <span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">range</span><span class="s2">(</span><span class="s1">type_matrix</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">[</span><span class="s3">0</span><span class="s2">]):               </span><span class="s4">#Initialising the type matrix 0 = energy type, 1 = political type, 2 = climate type</span>
+           <span class="s0">for </span><span class="s1">j </span><span class="s0">in </span><span class="s1">range</span><span class="s2">(</span><span class="s1">type_matrix</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">[</span><span class="s3">1</span><span class="s2">]):</span>
+                <span class="s1">type_matrix</span><span class="s2">[</span><span class="s1">i</span><span class="s2">,</span><span class="s1">j</span><span class="s2">]= </span><span class="s1">bern</span><span class="s2">(</span><span class="s3">0.5</span><span class="s2">)</span>
+       <span class="s1">S </span><span class="s2">= </span><span class="s1">np</span><span class="s2">.</span><span class="s1">random</span><span class="s2">.</span><span class="s1">rand</span><span class="s2">()</span>
+       <span class="s1">m </span><span class="s2">= </span><span class="s3">0                                               </span><span class="s4">#Let it be a partial pooling equlibrium where high political types play lead whereas others play veto</span>
+       <span class="s0">while </span><span class="s1">m</span><span class="s2">&lt;</span><span class="s1">n</span><span class="s2">:</span>
+           <span class="s1">lead </span><span class="s2">= </span><span class="s3">0</span>
+           <span class="s1">swing </span><span class="s2">= </span><span class="s3">0</span>
+           <span class="s1">veto </span><span class="s2">= </span><span class="s3">0</span>
+           <span class="s1">k </span><span class="s2">= </span><span class="s3">0</span>
+           <span class="s1">bel </span><span class="s2">= </span><span class="s1">random_joint_distribution</span><span class="s2">(</span><span class="s3">7</span><span class="s2">)</span>
+           <span class="s1">approx  </span><span class="s2">= </span><span class="s1">np</span><span class="s2">.</span><span class="s1">zeros</span><span class="s2">((</span><span class="s1">l</span><span class="s2">,</span><span class="s3">7</span><span class="s2">))</span>
+           <span class="s0">for </span><span class="s1">c </span><span class="s0">in </span><span class="s1">range</span><span class="s2">(</span><span class="s1">approx</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">[</span><span class="s3">0</span><span class="s2">]):</span>
+               <span class="s1">approx</span><span class="s2">[</span><span class="s1">c</span><span class="s2">,:] = </span><span class="s1">sps</span><span class="s2">.</span><span class="s1">multinomial</span><span class="s2">.</span><span class="s1">rvs</span><span class="s2">(</span><span class="s1">n</span><span class="s2">,</span><span class="s1">bel</span><span class="s2">)</span>
+               <span class="s4">#if approx[c,:4].sum()&gt;=n*(1/2):             #This line assumes that first 4 types are enough to force a coalition</span>
+               <span class="s0">if </span><span class="s1">bern</span><span class="s2">(</span><span class="s3">0.25</span><span class="s2">) == </span><span class="s3">1 </span><span class="s2">:</span>
+                  <span class="s1">lead </span><span class="s2">+= (-</span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">0</span><span class="s2">,</span><span class="s1">m</span><span class="s2">]*(</span><span class="s3">1</span><span class="s2">/</span><span class="s1">param</span><span class="s2">[</span><span class="s3">0</span><span class="s2">])+</span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">1</span><span class="s2">,</span><span class="s1">m</span><span class="s2">]-</span><span class="s1">param</span><span class="s2">[</span><span class="s3">3</span><span class="s2">]*</span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">2</span><span class="s2">,</span><span class="s1">m</span><span class="s2">]) </span><span class="s4">#Since no one plays swing</span>
+                  <span class="s1">swing </span><span class="s2">+=  (</span>
+                              <span class="s2">-</span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">0</span><span class="s2">, </span><span class="s1">m</span><span class="s2">] + </span><span class="s1">param</span><span class="s2">[</span><span class="s3">1</span><span class="s2">]*</span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">1</span><span class="s2">, </span><span class="s1">m</span><span class="s2">] - (</span><span class="s1">param</span><span class="s2">[</span><span class="s3">3</span><span class="s2">] * </span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">2</span><span class="s2">, </span><span class="s1">m</span><span class="s2">]+</span><span class="s1">np</span><span class="s2">.</span><span class="s1">random</span><span class="s2">.</span><span class="s1">rand</span><span class="s2">()))</span>
+                  <span class="s1">veto </span><span class="s2">+= (</span>
+                          <span class="s2">(-</span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">0</span><span class="s2">, </span><span class="s1">m</span><span class="s2">] * (</span><span class="s1">param</span><span class="s2">[</span><span class="s3">0</span><span class="s2">]) )+ (-</span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">1</span><span class="s2">, </span><span class="s1">m</span><span class="s2">]*(</span><span class="s3">1</span><span class="s2">/</span><span class="s1">param</span><span class="s2">[</span><span class="s3">1</span><span class="s2">])) - (</span><span class="s1">param</span><span class="s2">[</span><span class="s3">3</span><span class="s2">]*(</span><span class="s3">1</span><span class="s2">/</span><span class="s1">param</span><span class="s2">[</span><span class="s3">2</span><span class="s2">]) * </span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">2</span><span class="s2">, </span><span class="s1">m</span><span class="s2">]))</span>
+               <span class="s0">else</span><span class="s2">:</span>
+                   <span class="s1">lead </span><span class="s2">+= (</span>
+                           <span class="s2">(</span><span class="s1">param</span><span class="s2">[</span><span class="s3">0</span><span class="s2">]*</span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">0</span><span class="s2">, </span><span class="s1">m</span><span class="s2">])+</span><span class="s1">param</span><span class="s2">[</span><span class="s3">1</span><span class="s2">]*</span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">1</span><span class="s2">, </span><span class="s1">m</span><span class="s2">] - (</span><span class="s1">param</span><span class="s2">[</span><span class="s3">4</span><span class="s2">] *</span><span class="s1">param</span><span class="s2">[</span><span class="s3">2</span><span class="s2">]* </span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">2</span><span class="s2">, </span><span class="s1">m</span><span class="s2">]))</span>
+                   <span class="s1">swing </span><span class="s2">+= (</span>
+                           <span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">0</span><span class="s2">, </span><span class="s1">m</span><span class="s2">] - </span><span class="s1">param</span><span class="s2">[</span><span class="s3">1</span><span class="s2">] * </span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">1</span><span class="s2">, </span><span class="s1">m</span><span class="s2">] - (</span>
+                               <span class="s1">param</span><span class="s2">[</span><span class="s3">4</span><span class="s2">] * </span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">2</span><span class="s2">, </span><span class="s1">m</span><span class="s2">]))</span>
+                   <span class="s1">veto </span><span class="s2">+= (</span>
+                           <span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">0</span><span class="s2">, </span><span class="s1">m</span><span class="s2">]  + </span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">1</span><span class="s2">, </span><span class="s1">m</span><span class="s2">] - (</span>
+                               <span class="s1">param</span><span class="s2">[</span><span class="s3">4</span><span class="s2">] * </span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">2</span><span class="s2">, </span><span class="s1">m</span><span class="s2">]))</span>
+               <span class="s4">#bel = [approx[c,i]/approx[c,:].sum() for i in range(7)]</span>
+           <span class="s1">ap_lead </span><span class="s2">= </span><span class="s1">lead</span><span class="s2">/</span><span class="s1">l</span>
+           <span class="s1">ap_swing </span><span class="s2">= </span><span class="s1">swing</span><span class="s2">/</span><span class="s1">l</span>
+           <span class="s1">ap_veto </span><span class="s2">= </span><span class="s1">veto</span><span class="s2">/</span><span class="s1">l</span>
+           <span class="s0">if </span><span class="s1">ap_lead</span><span class="s2">&gt;= </span><span class="s1">ap_swing </span><span class="s0">and </span><span class="s1">ap_lead</span><span class="s2">&gt;= </span><span class="s1">ap_veto</span><span class="s2">:</span>
+               <span class="s1">strategy_matrix</span><span class="s2">[</span><span class="s1">b</span><span class="s2">,</span><span class="s1">m</span><span class="s2">] = </span><span class="s3">2</span>
+           <span class="s0">elif </span><span class="s1">ap_swing</span><span class="s2">&gt;= </span><span class="s1">ap_lead </span><span class="s0">and </span><span class="s1">ap_swing</span><span class="s2">&gt;=</span><span class="s1">ap_veto</span><span class="s2">:</span>
+               <span class="s1">strategy_matrix</span><span class="s2">[</span><span class="s1">b</span><span class="s2">, </span><span class="s1">m</span><span class="s2">] = </span><span class="s3">1</span>
+           <span class="s0">elif </span><span class="s1">ap_veto</span><span class="s2">&gt;= </span><span class="s1">ap_lead </span><span class="s0">and </span><span class="s1">ap_veto</span><span class="s2">&gt;= </span><span class="s1">ap_swing</span><span class="s2">:</span>
+               <span class="s1">strategy_matrix</span><span class="s2">[</span><span class="s1">b</span><span class="s2">, </span><span class="s1">m</span><span class="s2">] = </span><span class="s3">0</span>
+           <span class="s1">m</span><span class="s2">+=</span><span class="s3">1</span>
+       <span class="s1">b</span><span class="s2">+=</span><span class="s3">1</span>
+    <span class="s0">return </span><span class="s1">strategy_matrix</span><span class="s2">,</span><span class="s1">type_matrix</span><span class="s2">,</span><span class="s1">param</span>
+<span class="s1">blegh</span><span class="s2">,</span><span class="s1">blegh2</span><span class="s2">,</span><span class="s1">blegh3 </span><span class="s2">= </span><span class="s1">bayesian_climate_game</span><span class="s2">(</span><span class="s3">10</span><span class="s2">,</span><span class="s3">50</span><span class="s2">,</span><span class="s3">10000</span><span class="s2">)</span>
+
+
+<span class="s0">def </span><span class="s1">per_type_strategy_graphs</span><span class="s2">(</span><span class="s1">strategy_matrix</span><span class="s2">, </span><span class="s1">type_matrix</span><span class="s2">, </span><span class="s1">param_values</span><span class="s2">):</span>
+    <span class="s5">&quot;&quot;&quot; 
+    Generates separate bar plots for each type, showing strategy counts with readable labels. 
+ 
+    Parameters: 
+    strategy_matrix : (a x n) array 
+    type_matrix : (3 x n) array 
+    param_values : array of parameter values used in simulation 
+    &quot;&quot;&quot;</span>
+
+    <span class="s1">assoc_dict </span><span class="s2">= {</span><span class="s1">i</span><span class="s2">: {</span><span class="s6">'lead'</span><span class="s2">: </span><span class="s3">0</span><span class="s2">, </span><span class="s6">'swing'</span><span class="s2">: </span><span class="s3">0</span><span class="s2">, </span><span class="s6">'veto'</span><span class="s2">: </span><span class="s3">0</span><span class="s2">} </span><span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">range</span><span class="s2">(</span><span class="s3">8</span><span class="s2">)}</span>
+    <span class="s1">n_agents </span><span class="s2">= </span><span class="s1">type_matrix</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">[</span><span class="s3">1</span><span class="s2">]</span>
+
+    <span class="s4"># Compute type codes 0-7</span>
+    <span class="s1">type_codes </span><span class="s2">= (</span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">0</span><span class="s2">, :].</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">int</span><span class="s2">) &lt;&lt; </span><span class="s3">2</span><span class="s2">) + (</span><span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">1</span><span class="s2">, :].</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">int</span><span class="s2">) &lt;&lt; </span><span class="s3">1</span><span class="s2">) + (</span>
+        <span class="s1">type_matrix</span><span class="s2">[</span><span class="s3">2</span><span class="s2">, :].</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">int</span><span class="s2">))</span>
+
+    <span class="s4"># Count strategy choices by type</span>
+    <span class="s0">for </span><span class="s1">run </span><span class="s0">in </span><span class="s1">strategy_matrix</span><span class="s2">:</span>
+        <span class="s0">for </span><span class="s1">idx </span><span class="s0">in </span><span class="s1">range</span><span class="s2">(</span><span class="s1">n_agents</span><span class="s2">):</span>
+            <span class="s1">tcode </span><span class="s2">= </span><span class="s1">int</span><span class="s2">(</span><span class="s1">type_codes</span><span class="s2">[</span><span class="s1">idx</span><span class="s2">])</span>
+            <span class="s1">strat </span><span class="s2">= </span><span class="s1">run</span><span class="s2">[</span><span class="s1">idx</span><span class="s2">]</span>
+            <span class="s0">if </span><span class="s1">strat </span><span class="s2">== </span><span class="s3">2</span><span class="s2">:</span>
+                <span class="s1">assoc_dict</span><span class="s2">[</span><span class="s1">tcode</span><span class="s2">][</span><span class="s6">'lead'</span><span class="s2">] += </span><span class="s3">1</span>
+            <span class="s0">elif </span><span class="s1">strat </span><span class="s2">== </span><span class="s3">1</span><span class="s2">:</span>
+                <span class="s1">assoc_dict</span><span class="s2">[</span><span class="s1">tcode</span><span class="s2">][</span><span class="s6">'swing'</span><span class="s2">] += </span><span class="s3">1</span>
+            <span class="s0">elif </span><span class="s1">strat </span><span class="s2">== </span><span class="s3">0</span><span class="s2">:</span>
+                <span class="s1">assoc_dict</span><span class="s2">[</span><span class="s1">tcode</span><span class="s2">][</span><span class="s6">'veto'</span><span class="s2">] += </span><span class="s3">1</span>
+
+    <span class="s4"># Plot separate graph per type if that type exists</span>
+    <span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">range</span><span class="s2">(</span><span class="s3">8</span><span class="s2">):</span>
+        <span class="s1">energy </span><span class="s2">= (</span><span class="s1">i </span><span class="s2">&gt;&gt; </span><span class="s3">2</span><span class="s2">) &amp; </span><span class="s3">1</span>
+        <span class="s1">political </span><span class="s2">= (</span><span class="s1">i </span><span class="s2">&gt;&gt; </span><span class="s3">1</span><span class="s2">) &amp; </span><span class="s3">1</span>
+        <span class="s1">climate </span><span class="s2">= </span><span class="s1">i </span><span class="s2">&amp; </span><span class="s3">1</span>
+
+        <span class="s1">total </span><span class="s2">= </span><span class="s1">assoc_dict</span><span class="s2">[</span><span class="s1">i</span><span class="s2">][</span><span class="s6">'lead'</span><span class="s2">] + </span><span class="s1">assoc_dict</span><span class="s2">[</span><span class="s1">i</span><span class="s2">][</span><span class="s6">'swing'</span><span class="s2">] + </span><span class="s1">assoc_dict</span><span class="s2">[</span><span class="s1">i</span><span class="s2">][</span><span class="s6">'veto'</span><span class="s2">]</span>
+
+        <span class="s0">if </span><span class="s1">total </span><span class="s2">== </span><span class="s3">0</span><span class="s2">:</span>
+            <span class="s0">continue  </span><span class="s4"># Skip types not realised</span>
+
+        <span class="s1">labels </span><span class="s2">= [</span><span class="s6">'Veto (0)'</span><span class="s2">, </span><span class="s6">'Swing (1)'</span><span class="s2">, </span><span class="s6">'Lead (2)'</span><span class="s2">]</span>
+        <span class="s1">counts </span><span class="s2">= [</span><span class="s1">assoc_dict</span><span class="s2">[</span><span class="s1">i</span><span class="s2">][</span><span class="s6">'veto'</span><span class="s2">], </span><span class="s1">assoc_dict</span><span class="s2">[</span><span class="s1">i</span><span class="s2">][</span><span class="s6">'swing'</span><span class="s2">], </span><span class="s1">assoc_dict</span><span class="s2">[</span><span class="s1">i</span><span class="s2">][</span><span class="s6">'lead'</span><span class="s2">]]</span>
+        <span class="s1">colors </span><span class="s2">= [</span><span class="s6">'red'</span><span class="s2">, </span><span class="s6">'orange'</span><span class="s2">, </span><span class="s6">'green'</span><span class="s2">]</span>
+
+        <span class="s1">plt</span><span class="s2">.</span><span class="s1">figure</span><span class="s2">(</span><span class="s1">figsize</span><span class="s2">=(</span><span class="s3">5</span><span class="s2">, </span><span class="s3">4</span><span class="s2">))</span>
+        <span class="s1">plt</span><span class="s2">.</span><span class="s1">bar</span><span class="s2">(</span><span class="s1">labels</span><span class="s2">, </span><span class="s1">counts</span><span class="s2">, </span><span class="s1">color</span><span class="s2">=</span><span class="s1">colors</span><span class="s2">)</span>
+
+        <span class="s1">title_str </span><span class="s2">= </span><span class="s6">f&quot;θₑ=</span><span class="s0">{</span><span class="s1">energy</span><span class="s0">}</span><span class="s6">, θₚ=</span><span class="s0">{</span><span class="s1">political</span><span class="s0">}</span><span class="s6">,θ₍c₎ =</span><span class="s0">{</span><span class="s1">climate</span><span class="s0">}</span><span class="s6">&quot;</span>
+        <span class="s1">plt</span><span class="s2">.</span><span class="s1">title</span><span class="s2">(</span><span class="s6">f&quot;Strategy Counts for Type: </span><span class="s0">{</span><span class="s1">title_str</span><span class="s0">}</span><span class="s6">&quot;</span><span class="s2">)</span>
+        <span class="s1">plt</span><span class="s2">.</span><span class="s1">ylabel</span><span class="s2">(</span><span class="s6">'Total Count Across Runs'</span><span class="s2">)</span>
+        <span class="s1">plt</span><span class="s2">.</span><span class="s1">grid</span><span class="s2">(</span><span class="s1">axis</span><span class="s2">=</span><span class="s6">'y'</span><span class="s2">, </span><span class="s1">linestyle</span><span class="s2">=</span><span class="s6">'--'</span><span class="s2">, </span><span class="s1">alpha</span><span class="s2">=</span><span class="s3">0.5</span><span class="s2">)</span>
+        <span class="s1">plt</span><span class="s2">.</span><span class="s1">show</span><span class="s2">()</span>
+
+    <span class="s4"># Print parameter values</span>
+    <span class="s1">print</span><span class="s2">(</span><span class="s6">&quot;Parameter Values Used:&quot;</span><span class="s2">)</span>
+    <span class="s1">print</span><span class="s2">(</span>
+        <span class="s6">f&quot;β = </span><span class="s0">{</span><span class="s1">param_values</span><span class="s2">[</span><span class="s3">0</span><span class="s2">]</span><span class="s0">:</span><span class="s6">.3f</span><span class="s0">}</span><span class="s6">, α = </span><span class="s0">{</span><span class="s1">param_values</span><span class="s2">[</span><span class="s3">1</span><span class="s2">]</span><span class="s0">:</span><span class="s6">.3f</span><span class="s0">}</span><span class="s6">, γ = </span><span class="s0">{</span><span class="s1">param_values</span><span class="s2">[</span><span class="s3">2</span><span class="s2">]</span><span class="s0">:</span><span class="s6">.3f</span><span class="s0">}</span><span class="s6">, pₗ = </span><span class="s0">{</span><span class="s1">param_values</span><span class="s2">[</span><span class="s3">3</span><span class="s2">]</span><span class="s0">:</span><span class="s6">.3f</span><span class="s0">}</span><span class="s6">, pₕ = </span><span class="s0">{</span><span class="s1">param_values</span><span class="s2">[</span><span class="s3">4</span><span class="s2">]</span><span class="s0">:</span><span class="s6">.3f</span><span class="s0">}</span><span class="s6">&quot;</span><span class="s2">)</span>
+<span class="s1">per_type_strategy_graphs</span><span class="s2">(</span><span class="s1">blegh</span><span class="s2">, </span><span class="s1">blegh2</span><span class="s2">, </span><span class="s1">blegh3</span><span class="s2">)</span>
+<span class="s0">def </span><span class="s1">count_coalitions</span><span class="s2">(</span><span class="s1">strategy_matrix</span><span class="s2">):</span>
+    <span class="s5">&quot;&quot;&quot; 
+    Counts the number of coalition-forming rounds. 
+    Coalition forms if n_Lead + n_Swing &gt;= n_v 
+    &quot;&quot;&quot;</span>
+    <span class="s1">coalition_formed </span><span class="s2">= []</span>
+    <span class="s0">for </span><span class="s1">row </span><span class="s0">in </span><span class="s1">strategy_matrix</span><span class="s2">:</span>
+        <span class="s1">n_L </span><span class="s2">= </span><span class="s1">np</span><span class="s2">.</span><span class="s1">sum</span><span class="s2">(</span><span class="s1">row </span><span class="s2">== </span><span class="s3">2</span><span class="s2">)</span>
+        <span class="s1">n_S </span><span class="s2">= </span><span class="s1">np</span><span class="s2">.</span><span class="s1">sum</span><span class="s2">(</span><span class="s1">row </span><span class="s2">== </span><span class="s3">1</span><span class="s2">)</span>
+        <span class="s1">n_v </span><span class="s2">= </span><span class="s1">np</span><span class="s2">.</span><span class="s1">sum</span><span class="s2">(</span><span class="s1">row </span><span class="s2">== </span><span class="s3">0</span><span class="s2">)</span>
+        <span class="s1">coalition_formed</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s3">1 </span><span class="s0">if </span><span class="s2">(</span><span class="s1">n_L </span><span class="s2">+ </span><span class="s1">n_S</span><span class="s2">) &gt;= </span><span class="s1">n_v </span><span class="s0">else </span><span class="s3">0</span><span class="s2">)</span>
+    <span class="s0">return </span><span class="s1">coalition_formed</span>
+
+<span class="s4"># 2. Plot coalition formation over simulation rounds</span>
+<span class="s0">def </span><span class="s1">plot_coalition_formation</span><span class="s2">(</span><span class="s1">coalition_list</span><span class="s2">):</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">figure</span><span class="s2">(</span><span class="s1">figsize</span><span class="s2">=(</span><span class="s3">8</span><span class="s2">, </span><span class="s3">3</span><span class="s2">))</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">plot</span><span class="s2">(</span><span class="s1">coalition_list</span><span class="s2">, </span><span class="s1">drawstyle</span><span class="s2">=</span><span class="s6">'steps-mid'</span><span class="s2">, </span><span class="s1">label</span><span class="s2">=</span><span class="s6">&quot;Coalition Formed&quot;</span><span class="s2">, </span><span class="s1">color</span><span class="s2">=</span><span class="s6">'blue'</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">xlabel</span><span class="s2">(</span><span class="s6">&quot;Round&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">ylabel</span><span class="s2">(</span><span class="s6">&quot;Coalition Status&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">title</span><span class="s2">(</span><span class="s6">&quot;Coalition Formation Over Rounds&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">yticks</span><span class="s2">([</span><span class="s3">0</span><span class="s2">, </span><span class="s3">1</span><span class="s2">], </span><span class="s1">labels</span><span class="s2">=[</span><span class="s6">&quot;No&quot;</span><span class="s2">, </span><span class="s6">&quot;Yes&quot;</span><span class="s2">])</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">grid</span><span class="s2">(</span><span class="s0">True</span><span class="s2">, </span><span class="s1">linestyle</span><span class="s2">=</span><span class="s6">'--'</span><span class="s2">, </span><span class="s1">alpha</span><span class="s2">=</span><span class="s3">0.5</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">tight_layout</span><span class="s2">()</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">show</span><span class="s2">()</span>
+<span class="s1">coalition_list </span><span class="s2">= </span><span class="s1">count_coalitions</span><span class="s2">(</span><span class="s1">blegh</span><span class="s2">)</span>
+<span class="s1">plot_coalition_formation</span><span class="s2">(</span><span class="s1">coalition_list</span><span class="s2">)</span></pre>
+</body>
+</html>
